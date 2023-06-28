@@ -14,3 +14,30 @@
     padding: 0;
     overflow-x: hidden;
   }
+
+  form {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px 0 0 5px;
+    border: 1px solid #ccc;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #bcd7bd;
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+button[type="submit"]:hover {
+    background-color: #78a87b;
+}
