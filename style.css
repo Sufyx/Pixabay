@@ -1,0 +1,16 @@
+/*
+ * Image Displayer
+ * Asaf Gilboa
+ * 28/06/2023
+ */
+
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
