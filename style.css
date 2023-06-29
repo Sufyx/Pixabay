@@ -67,6 +67,11 @@ button[type="submit"]:hover {
   align-items: center;
 }
 
+.imageWrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .imageCard {
   width: 90%;
   height: auto;
@@ -91,6 +96,24 @@ button[type="submit"]:hover {
   border: 5px outset #339f9b;
   border-radius: 20px;
   box-shadow: 0 0 15px 15px #8eb1b0;
+}
+
+.imgTooltip {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  transform: translateX(-20%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+.imageWrapper:hover .imgTooltip {
+  opacity: 1;
 }
 
 #moreImagesBtn {
