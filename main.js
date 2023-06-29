@@ -11,6 +11,7 @@ const API_KEY = '37958354-de46dabfdd71801db390aedd0';
 
 let requestPage = 1;
 let searchText = '';
+let modalOpen = false;
 // let imagesArray = [];
 
 
@@ -23,7 +24,7 @@ function fetchImages() {
             for (let i = 0; i < data.hits.length; i++) {
                 // imagesArray.push(data.hits[i].webformatURL);
                 const imgElement = `<img src="${data.hits[i].webformatURL}" alt="searched image"
-                onclick='imgClick(this, "${(requestPage * 20) + i}")' class="imageCard">`;
+                onclick='imgClick(this)' class="imageCard">`;
                 document.getElementById("imageGrid").innerHTML += imgElement;
             }
         });
@@ -45,9 +46,29 @@ function imageSearchClick(e) {
 
 
 function imgClick(element) {
-    console.log("this) : ", element.src);
+    if (modalOpen) return;
+    document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
+    document.getElementById("imageModalUI").style.display = "block";
+    document.getElementById("modalImage").src = element.src;
+    document.getElementById("pageWrapper").style.filter = "blur(4px)";
+
+    //to prevent "outside modal" clicks from being triggered simultaneously
+    setTimeout(() => {  
+        modalOpen = true;
+      }, 0);
 }
 
-function slide(direction) {
-    console.log(direction);
+function handlePageClick (e) {
+    if (!document.getElementById("imageModalUI").contains(e.target)) {
+        console.log('# # # # #');
+        closeModal();
+    }
+}
+
+function closeModal() {
+    if (!modalOpen) return;
+    document.getElementById("pageWrapper").style.filter = "none";
+    document.getElementById("imageModalUI").style.display = 'none';
+    document.getElementById("pageWrapper").removeEventListener('click', handlePageClick);
+    modalOpen = false;
 }

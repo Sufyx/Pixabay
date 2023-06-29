@@ -12,12 +12,14 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: rgb(217, 224, 224);
 }
 
 #pageWrapper {
   position: relative;
   display: flex;
   flex-direction: column;
+  /* filter: blur(4px); */
 }
 
 form {
@@ -72,6 +74,7 @@ button[type="submit"]:hover {
   cursor: pointer;
   border: 6px ridge #8da98f;
   border-radius: 5px;
+  background-color: whitesmoke;
 }
 
 .imageCard:before {
@@ -98,16 +101,24 @@ button[type="submit"]:hover {
 }
 
 #imageModalUI {
-  position: absolute;
-  /* display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5%;
-  height: 60vh; */
+  display: none;
+  position: fixed;
+  text-align: center;
+  top: 10%;
+  left: 35%;
+  border: 6px ridge #8da98f;
+  border-radius: 5px;
+  background-color: whitesmoke;
+  filter: none;
+  z-index: 9999;
 }
 
 #modalImage {
-
+  width: auto;
+  height: auto;
+  max-height: 90%;
+  max-width: 90%;
+  object-fit: cover;
 }
 
 .slider {
