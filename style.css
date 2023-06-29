@@ -96,6 +96,7 @@ button[type="submit"]:hover {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 #moreImagesBtn:hover {
   background-color: #5a835c;
 }
@@ -103,9 +104,10 @@ button[type="submit"]:hover {
 #imageModalUI {
   display: none;
   position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
-  top: 10%;
-  left: 35%;
   border: 6px ridge #8da98f;
   border-radius: 5px;
   background-color: whitesmoke;
@@ -129,4 +131,16 @@ button[type="submit"]:hover {
 .slider:hover {
   filter: hue-rotate(90deg);
   cursor: pointer;
+}
+
+
+@media (max-width: 800px) {
+  #imageGrid {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 5% 0;
+  }
+
+  #imageModalUI {
+    width: 84%;
+  }
 }

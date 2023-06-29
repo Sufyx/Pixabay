@@ -52,7 +52,7 @@ function imgClick(element) {
     document.getElementById("modalImage").src = element.src;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
 
-    //to prevent "outside modal" clicks from being triggered simultaneously
+    // to prevent "outside modal" click events from being triggered simultaneously as image clicks
     setTimeout(() => {  
         modalOpen = true;
       }, 0);
@@ -60,7 +60,6 @@ function imgClick(element) {
 
 function handlePageClick (e) {
     if (!document.getElementById("imageModalUI").contains(e.target)) {
-        console.log('# # # # #');
         closeModal();
     }
 }
