@@ -5,8 +5,6 @@
  */
 
 
-// I'm aware this shouldn't be here, 
-// for the sake of the exercise I'm avoiding using an env file for now
 const API_KEY = '37958354-de46dabfdd71801db390aedd0';
 
 let requestPage = 1;
