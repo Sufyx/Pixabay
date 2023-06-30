@@ -13,6 +13,7 @@ let requestPage = 1;
 let searchText = '';
 let modalOpen = false;
 let imagesArray = [];
+let favorites = {};
 
 
 function fetchImages() {
@@ -26,16 +27,25 @@ function fetchImages() {
             }
             for (let i = 0; i < data.hits.length; i++) {
                 imagesArray.push(data.hits[i]);
+                let favorited = (data.hits[i].id in favorites);
                 const imgElement =
                     `<div class="imageWrapper">
-                        <img src="${data.hits[i].webformatURL}" alt="searched image" onclick='imgClick(this)' 
+                        <img src="${data.hits[i].webformatURL}" alt="searched image" 
+                        onclick='imgClick(this)' 
                         class="imageCard" id="image_${imagesArray.length - 1}" >
+
                         <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
-                        Image tags: <br> ${data.hits[i].tags}
+                        Tags: <br> ${data.hits[i].tags}
                         <br> - - - <br>
-                        By user: ${data.hits[i].user}
+                        User: ${data.hits[i].user}
                         <br> - - - <br>
                         Likes: ${data.hits[i].likes}
+                        </span>
+
+                        <span class="favBtn ${favorited ? 'favorited' : ''}" 
+                            id="fav_${imagesArray.length - 1}"
+                            onclick='favClick(this)'>
+                            &#10084;
                         </span>
                     </div>`;
                 document.getElementById("imageGrid").innerHTML += imgElement;
@@ -65,13 +75,29 @@ function imgClick(imgElement) {
     document.getElementById("imageModalUI").style.display = "block";
     document.getElementById("modalImage").src = imgElement.src;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
-
-    // to prevent "outside modal" click events from being triggered simultaneously as image clicks
     setTimeout(() => {
         modalOpen = true;
     }, 0);
-    const imgIndex = Number(imgElement.id.substring(6));
-    console.log(`imagesArray[${imgIndex}] = `, imagesArray[imgIndex]);
+}
+
+
+
+// document.getElementById('showFavorites').addEventListener('click', showFavsClick);
+// function showFavsClick(e) {
+//     e.preventDefault();
+
+// }
+
+function favClick(favElement) {
+    if (modalOpen) return;
+    const imgIndex = Number(favElement.id.substring(4));
+    if (!(imagesArray[imgIndex].id in favorites)) {
+        favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
+        favElement.style.color = "red";
+    } else {
+        delete favorites[imagesArray[imgIndex].id];
+        favElement.style.color = "lightslategray";
+    }
 }
 
 

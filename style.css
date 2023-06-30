@@ -22,10 +22,16 @@ body {
   /* filter: blur(4px); */
 }
 
+#topWrapper {
+  margin-top: 5%;
+  display: flex;
+  justify-content: center;
+}
+
 form {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  flex-grow: 1;
 }
 
 input[type="text"] {
@@ -115,6 +121,42 @@ button[type="submit"]:hover {
 .imageWrapper:hover .imgTooltip {
   opacity: 1;
 }
+.favBtn {
+  position: absolute;
+  top: 4%;
+  right: 14%;
+  background-color: #fff;
+  color: lightslategray;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 15px;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s linear;
+  z-index: 99;
+}
+.favBtn:hover {
+  opacity: 1;
+}
+.favorited {
+  color: red;
+}
+
+#showFavorites {
+  padding: 15px 20px;
+  margin-right: 5%; 
+  font-size: 15px;
+  font-weight: 600;
+  color: #7d9a7d;
+  background-color: whitesmoke;
+  border: 3px ridge #7d9a7d;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#showFavorites:hover {
+  background-color: #dae4da;
+}
 
 #moreImagesBtn {
   display: none;
@@ -132,6 +174,7 @@ button[type="submit"]:hover {
 #moreImagesBtn:hover {
   background-color: #5a835c;
 }
+
 
 #imageModalUI {
   display: none;
