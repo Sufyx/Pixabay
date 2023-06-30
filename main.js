@@ -5,8 +5,6 @@
  */
 
 
-const API_KEY = '37958354-de46dabfdd71801db390aedd0';
-
 let requestPage = 1;
 let searchText = '';
 let modalOpen = false;
@@ -15,29 +13,37 @@ let favorites = {};
 
 
 function fetchImages() {
-    const fetchString = `https://pixabay.com/api/?key=${API_KEY}&q=${searchText}&page=${requestPage}&pretty=true`;
+    const fetchString = `http://localhost:3000/images/${searchText}/${requestPage}`;
     fetch(fetchString)
         .then((response) => response.json())
         .then((data) => {
-            if (data.hits.length < 20) {
+            if (data.length < 20) {
                 document.getElementById("moreImagesBtn").style.display = "none";
-                if (data.hits.length === 0) return;
+                if (data.length === 0) {
+                    if (requestPage === 1) {
+                        const noResMessage =
+                            `<span class='noResMessage'>No Results found</span>`;
+                        document.getElementById("message").innerHTML = noResMessage;
+                    }
+                    return;
+                }
+
             }
-            for (let i = 0; i < data.hits.length; i++) {
-                imagesArray.push(data.hits[i]);
-                let favorited = (data.hits[i].id in favorites);
+            for (let i = 0; i < data.length; i++) {
+                imagesArray.push(data[i]);
+                let favorited = (data[i].id in favorites);
                 const imgElement =
                     `<div class="imageWrapper">
-                        <img src="${data.hits[i].webformatURL}" alt="searched image" 
+                        <img src="${data[i].webformatURL}" alt="searched image" 
                         onclick='imgClick(this)' 
                         class="imageCard" id="image_${imagesArray.length - 1}" >
 
                         <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
-                        Tags: <br> ${data.hits[i].tags}
+                        Tags: <br> ${data[i].tags}
                         <br> - - - <br>
-                        User: ${data.hits[i].user}
+                        User: ${data[i].user}
                         <br> - - - <br>
-                        Likes: ${data.hits[i].likes}
+                        Likes: ${data[i].likes}
                         </span>
 
                         <span class="favBtn ${favorited ? 'favorited' : ''}" 
@@ -48,8 +54,8 @@ function fetchImages() {
                     </div>`;
                 document.getElementById("imageGrid").innerHTML += imgElement;
             }
+            requestPage++;
         });
-    requestPage++;
 }
 
 
@@ -57,9 +63,11 @@ document.getElementById('moreImagesBtn').addEventListener('click', fetchImages);
 document.getElementById('imageSearchClick').addEventListener('click', imageSearchClick);
 function imageSearchClick(e) {
     e.preventDefault();
-    document.getElementById("moreImagesBtn").style.display = "none";
-    document.getElementById("imageGrid").innerHTML = '';
     searchText = document.getElementById("imageSearchBox").value;
+    if (!searchText) return;
+    document.getElementById("message").innerHTML = '';
+    document.getElementById("imageGrid").innerHTML = '';
+    document.getElementById("moreImagesBtn").style.display = "none";
     document.getElementById('showFavorites').innerHTML = "Favorites";
     imagesArray = [];
     requestPage = 1;
@@ -96,9 +104,14 @@ function favClick(favElement) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
+    document.getElementById("message").innerHTML = '';
     if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
         backToSearch();
         return;
+    } else if (Object.keys(favorites).length === 0) {
+        const noFavMessage =
+            `<span class='noResMessage'>No image favorited</span>`;
+        document.getElementById("message").innerHTML = noFavMessage;
     }
     document.getElementById("moreImagesBtn").style.display = "none";
     document.getElementById("imageGrid").innerHTML = '';
@@ -137,7 +150,7 @@ function backToSearch() {
     document.getElementById("moreImagesBtn").style.display = "block";
     imagesArray = [];
     requestPage = 1;
-    fetchImages();
+    if (searchText) fetchImages();
 }
 
 

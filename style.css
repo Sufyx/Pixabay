@@ -198,15 +198,28 @@ button[type="submit"]:hover {
   object-fit: cover;
 }
 
-.slider {
+.noResMessage {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  box-shadow: 0 0 3px 3px #a6c9ad;
+  color: #333;
+  font-size: 4vw;
+  font-weight: bold;
+}
+#message{
+  text-align: center;
+  margin-top: 10%;
+}
+
+/* .slider {
   height: 25%;
   margin: 5%;
 }
-
 .slider:hover {
   filter: hue-rotate(90deg);
   cursor: pointer;
-}
+} */
 
 
 @media (max-width: 800px) {

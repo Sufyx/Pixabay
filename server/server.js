@@ -20,7 +20,11 @@ app.listen(PORT, () => {
     console.log(`Listening on ${PORT}`);
 });
 
-// app.use("/images", imagesRoute);
+app.use("/images", imagesRoute);
+// app.use("/images", (req, res) => {
+//     console.log("images get called");
+//     res.send({ ok: true, message: `ok` });
+// });
 
 app.use(express.static(path.join(__dirname, '../')));
 app.get('/', (req, res) => {

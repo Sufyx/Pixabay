@@ -10,7 +10,7 @@ const router = express.Router();
 const { getImagesByTag } = require("./imagesController");
 
 
-router.get("/:searchQuery", getImagesByTag);
+router.get("/:searchText/:requestPage", getImagesByTag);
 
 
 module.exports = router;
