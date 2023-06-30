@@ -62,6 +62,7 @@ function imageSearchClick(e) {
     document.getElementById("moreImagesBtn").style.display = "none";
     document.getElementById("imageGrid").innerHTML = '';
     searchText = document.getElementById("imageSearchBox").value;
+    document.getElementById('showFavorites').innerHTML = "Favorites";
     imagesArray = [];
     requestPage = 1;
     fetchImages();
@@ -81,13 +82,6 @@ function imgClick(imgElement) {
 }
 
 
-
-// document.getElementById('showFavorites').addEventListener('click', showFavsClick);
-// function showFavsClick(e) {
-//     e.preventDefault();
-
-// }
-
 function favClick(favElement) {
     if (modalOpen) return;
     const imgIndex = Number(favElement.id.substring(4));
@@ -98,6 +92,54 @@ function favClick(favElement) {
         delete favorites[imagesArray[imgIndex].id];
         favElement.style.color = "lightslategray";
     }
+}
+
+
+document.getElementById('showFavorites').addEventListener('click', showFavsClick);
+function showFavsClick(e) {
+    e.preventDefault();
+    if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
+        backToSearch();
+        return;
+    }
+    document.getElementById("moreImagesBtn").style.display = "none";
+    document.getElementById("imageGrid").innerHTML = '';
+    imagesArray = [];
+    for (const key in favorites) {
+        imagesArray.push(favorites[key]);
+        const imgElement =
+            `<div class="imageWrapper">
+                <img src="${favorites[key].webformatURL}" alt="searched image" 
+                onclick='imgClick(this)' 
+                class="imageCard" id="image_${imagesArray.length - 1}" >
+
+                <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
+                Tags: <br> ${favorites[key].tags}
+                <br> - - - <br>
+                User: ${favorites[key].user}
+                <br> - - - <br>
+                Likes: ${favorites[key].likes}
+                </span>
+
+                <span class="favBtn favorited" 
+                    id="fav_${imagesArray.length - 1}"
+                    onclick='favClick(this)'>
+                    &#10084;
+                </span>
+            </div>`;
+        document.getElementById("imageGrid").innerHTML += imgElement;
+    }
+    document.getElementById('showFavorites').innerHTML = "Back To Search"
+}
+
+
+function backToSearch() {
+    document.getElementById("imageGrid").innerHTML = '';
+    document.getElementById('showFavorites').innerHTML = "Favorites";
+    document.getElementById("moreImagesBtn").style.display = "block";
+    imagesArray = [];
+    requestPage = 1;
+    fetchImages();
 }
 
 
