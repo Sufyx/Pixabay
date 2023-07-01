@@ -10,7 +10,7 @@ const router = express.Router();
 const { getImagesByTag, getRandomImages } = require("./imagesController");
 
 
-router.get("/:searchText/:requestPage", getImagesByTag);
+router.post("/", getImagesByTag);
 router.get("/random", getRandomImages);
 
 

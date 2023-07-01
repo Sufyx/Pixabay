@@ -7,10 +7,29 @@
 
 let requestPage = 1;
 let searchText = '';
+let selectedCategory = 'all';
 let modalOpen = false;
 let imagesArray = [];
 let favorites = {};
 
+
+
+function populateCategories() {
+    const imageCategories = [
+        "Backgrounds", "Fashion", "Nature", "Science", "Education",
+        "Feelings", "Health", "People", "Religion", "Places", "Animals",
+        "Industry", "Computer", "Food", "Sports", "Transportation",
+        "Travel", "Buildings", "Business", "Music"
+    ];
+    const dropdown = document.getElementById('categoryFilter');
+    imageCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.toLowerCase();
+        option.textContent = category;
+        dropdown.appendChild(option);
+    });
+}
+populateCategories()
 
 
 function populateGrid(images) {
@@ -45,7 +64,8 @@ function getRandomImages() {
     fetch(fetchString)
         .then((response) => response.json())
         .then((data) => {
-            console.log("res: " , data);
+            console.log("res: ", data);
+            document.getElementById("imageGrid").innerHTML = '';
             populateGrid(data);
         });
 }
@@ -53,8 +73,21 @@ getRandomImages();
 
 
 function fetchImagesByTags() {
-    const fetchString = `http://localhost:3000/images/${searchText}/${requestPage}`;
-    fetch(fetchString)
+    const searchParams = {
+        searchText: searchText,
+        selectedCategory: selectedCategory,
+        requestPage: requestPage
+    }
+    const fetchString =
+        `http://localhost:3000/images/`;
+    fetch(fetchString, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(searchParams),
+      })
         .then((response) => response.json())
         .then((data) => {
             if (data.length < 20) {
@@ -69,6 +102,7 @@ function fetchImagesByTags() {
                     return;
                 }
             }
+            console.log("res: ", data);
             populateGrid(data);
             requestPage++;
         });
@@ -79,8 +113,12 @@ document.getElementById('moreImagesBtn').addEventListener('click', fetchImagesBy
 document.getElementById('imageSearchClick').addEventListener('click', imageSearchClick);
 function imageSearchClick(e) {
     e.preventDefault();
-    searchText = document.getElementById("imageSearchBox").value.replace(/\s/g, '+');;
-    if (!searchText) return;
+    searchText = document.getElementById("imageSearchBox").value.replace(/\s/g, '+');
+    selectedCategory = document.getElementById("categoryFilter").value;
+    if (!searchText && (selectedCategory === 'all')) {
+        // getRandomImages();
+        return;
+    };
     document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     document.getElementById("imageGrid").innerHTML = '';
@@ -143,11 +181,11 @@ function showFavsClick(e) {
 function backToSearch() {
     document.getElementById("imageGrid").innerHTML = '';
     document.getElementById('showFavorites').innerHTML = "Favorites";
-    document.getElementById("moreImagesBtn").style.display = "block";
     imagesArray = [];
     requestPage = 1;
-    if (searchText) {
+    if (searchText || selectedCategory !== 'all') {
         fetchImagesByTags();
+        document.getElementById("moreImagesBtn").style.display = "block";
     } else {
         getRandomImages();
     }

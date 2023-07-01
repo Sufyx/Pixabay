@@ -34,14 +34,14 @@ form {
   flex-grow: 1;
 }
 
-input[type="text"] {
+#imageSearchBox {
   padding: 10px;
   font-size: 16px;
   border-radius: 5px 0 0 5px;
   border: 1px solid #ccc;
 }
 
-button[type="submit"] {
+#imageSearchClick {
   padding: 10px 20px;
   font-size: 1.8vw;
   font-weight: 600;
@@ -53,7 +53,7 @@ button[type="submit"] {
   transition: background-color 0.3s;
 }
 
-button[type="submit"]:hover {
+#imageSearchClick:hover {
   background-color: #78a87b;
 }
 
@@ -221,6 +221,50 @@ button[type="submit"]:hover {
   filter: hue-rotate(90deg);
   cursor: pointer;
 } */
+
+
+#categoryFilterWrapper {
+  display: inline-block;
+  position: relative;
+}
+
+#categoryFilterWrapper select {
+  height: 100%;
+  appearance: none;
+  background-color: #ffffff;
+  color: #575757;
+  cursor: pointer;
+  padding: 10px 25px 10px 20px;
+  font-size: 16px;
+  border-radius: 5px 0 0 5px;
+  border: 1px solid #ccc;
+}
+
+#categoryFilterWrapper select:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
+}
+
+#categoryFilterWrapper select option {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+#categoryFilterWrapper::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 6px 0 6px;
+  border-color: #999999 transparent transparent transparent;
+  pointer-events: none;
+}
 
 
 @media (max-width: 800px) {

@@ -11,8 +11,12 @@ const API_KEY = process.env.API_KEY;
 
 async function getImagesByTag(req, res) {
     try {
-        const { searchText, requestPage } = req.params;
-        const fetchString = `https://pixabay.com/api/?key=${API_KEY}&q=${searchText}&page=${requestPage}`;
+        const searchparams = req.body;
+        const { searchText, requestPage, selectedCategory } = searchparams;
+        const categoryParam = (selectedCategory !== 'all') ? `&category=${selectedCategory}` : '';
+        const queryParam = searchText ? `&q=${searchText}` : '';
+        const fetchString =
+            `https://pixabay.com/api/?key=${API_KEY}&page=${requestPage}` + queryParam + categoryParam;
         const response = await fetch(fetchString);
         const data = await response.json();
         res.send(data.hits);
@@ -44,14 +48,14 @@ async function getRandomImages(req, res) {
 
 
 function getRandomCategory() {
-    const categories = [
+    const imageCategories = [
         "backgrounds", "fashion", "nature", "science", "education",
         "feelings", "health", "people", "religion", "places", "animals",
         "industry", "computer", "food", "sports", "transportation",
         "travel", "buildings", "business", "music"
     ];
-    const randomIndex = Math.floor(Math.random() * categories.length);
-    const randomCategory = categories[randomIndex];
+    const randomIndex = Math.floor(Math.random() * imageCategories.length);
+    const randomCategory = imageCategories[randomIndex];
     return randomCategory;
 }
 
