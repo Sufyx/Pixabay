@@ -7,10 +7,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { getImagesByTag } = require("./imagesController");
+const { getImagesByTag, getRandomImages } = require("./imagesController");
 
 
 router.get("/:searchText/:requestPage", getImagesByTag);
+router.get("/random", getRandomImages);
 
 
 module.exports = router;

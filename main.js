@@ -12,7 +12,47 @@ let imagesArray = [];
 let favorites = {};
 
 
-function fetchImages() {
+
+function populateGrid(images) {
+    for (i in images) {
+        imagesArray.push(images[i]);
+        let favorited = (images[i].id in favorites);
+        const imgElement =
+            `<div class="imageWrapper">
+                <img src="${images[i].webformatURL}" alt="searched image" 
+                onclick='imgClick(this)' 
+                class="imageCard" id="image_${imagesArray.length - 1}" >
+                <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
+                Tags: <br> ${images[i].tags}
+                <br> - - - <br>
+                User: ${images[i].user}
+                <br> - - - <br>
+                Likes: ${images[i].likes}
+                </span>
+                <span class="favBtn ${favorited ? 'favorited' : ''}" 
+                    id="fav_${imagesArray.length - 1}"
+                    onclick='favClick(this)'>
+                    &#10084;
+                </span>
+            </div>`;
+        document.getElementById("imageGrid").innerHTML += imgElement;
+    }
+}
+
+
+function getRandomImages() {
+    const fetchString = `http://localhost:3000/images/random`;
+    fetch(fetchString)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("res: " , data);
+            populateGrid(data);
+        });
+}
+getRandomImages();
+
+
+function fetchImagesByTags() {
     const fetchString = `http://localhost:3000/images/${searchText}/${requestPage}`;
     fetch(fetchString)
         .then((response) => response.json())
@@ -23,55 +63,32 @@ function fetchImages() {
                     if (requestPage === 1) {
                         const noResMessage =
                             `<span class='noResMessage'>No Results found</span>`;
+                        document.getElementById("message").style.display = "block";
                         document.getElementById("message").innerHTML = noResMessage;
                     }
                     return;
                 }
-
             }
-            for (let i = 0; i < data.length; i++) {
-                imagesArray.push(data[i]);
-                let favorited = (data[i].id in favorites);
-                const imgElement =
-                    `<div class="imageWrapper">
-                        <img src="${data[i].webformatURL}" alt="searched image" 
-                        onclick='imgClick(this)' 
-                        class="imageCard" id="image_${imagesArray.length - 1}" >
-
-                        <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
-                        Tags: <br> ${data[i].tags}
-                        <br> - - - <br>
-                        User: ${data[i].user}
-                        <br> - - - <br>
-                        Likes: ${data[i].likes}
-                        </span>
-
-                        <span class="favBtn ${favorited ? 'favorited' : ''}" 
-                            id="fav_${imagesArray.length - 1}"
-                            onclick='favClick(this)'>
-                            &#10084;
-                        </span>
-                    </div>`;
-                document.getElementById("imageGrid").innerHTML += imgElement;
-            }
+            populateGrid(data);
             requestPage++;
         });
 }
 
 
-document.getElementById('moreImagesBtn').addEventListener('click', fetchImages);
+document.getElementById('moreImagesBtn').addEventListener('click', fetchImagesByTags);
 document.getElementById('imageSearchClick').addEventListener('click', imageSearchClick);
 function imageSearchClick(e) {
     e.preventDefault();
-    searchText = document.getElementById("imageSearchBox").value;
+    searchText = document.getElementById("imageSearchBox").value.replace(/\s/g, '+');;
     if (!searchText) return;
+    document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     document.getElementById("imageGrid").innerHTML = '';
     document.getElementById("moreImagesBtn").style.display = "none";
     document.getElementById('showFavorites').innerHTML = "Favorites";
     imagesArray = [];
     requestPage = 1;
-    fetchImages();
+    fetchImagesByTags();
     document.getElementById("moreImagesBtn").style.display = "block";
 }
 
@@ -104,6 +121,7 @@ function favClick(favElement) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
+    document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
         backToSearch();
@@ -111,35 +129,13 @@ function showFavsClick(e) {
     } else if (Object.keys(favorites).length === 0) {
         const noFavMessage =
             `<span class='noResMessage'>No image favorited</span>`;
+        document.getElementById("message").style.display = "block";
         document.getElementById("message").innerHTML = noFavMessage;
     }
     document.getElementById("moreImagesBtn").style.display = "none";
     document.getElementById("imageGrid").innerHTML = '';
     imagesArray = [];
-    for (const key in favorites) {
-        imagesArray.push(favorites[key]);
-        const imgElement =
-            `<div class="imageWrapper">
-                <img src="${favorites[key].webformatURL}" alt="searched image" 
-                onclick='imgClick(this)' 
-                class="imageCard" id="image_${imagesArray.length - 1}" >
-
-                <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
-                Tags: <br> ${favorites[key].tags}
-                <br> - - - <br>
-                User: ${favorites[key].user}
-                <br> - - - <br>
-                Likes: ${favorites[key].likes}
-                </span>
-
-                <span class="favBtn favorited" 
-                    id="fav_${imagesArray.length - 1}"
-                    onclick='favClick(this)'>
-                    &#10084;
-                </span>
-            </div>`;
-        document.getElementById("imageGrid").innerHTML += imgElement;
-    }
+    populateGrid(favorites);
     document.getElementById('showFavorites').innerHTML = "Back To Search"
 }
 
@@ -150,7 +146,11 @@ function backToSearch() {
     document.getElementById("moreImagesBtn").style.display = "block";
     imagesArray = [];
     requestPage = 1;
-    if (searchText) fetchImages();
+    if (searchText) {
+        fetchImagesByTags();
+    } else {
+        getRandomImages();
+    }
 }
 
 

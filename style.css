@@ -208,6 +208,7 @@ button[type="submit"]:hover {
   font-weight: bold;
 }
 #message{
+  display: none;
   text-align: center;
   margin-top: 10%;
 }
