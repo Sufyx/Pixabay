@@ -25,19 +25,22 @@ body {
   margin-top: 5%;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-form {
+.searchForm {
   display: flex;
   justify-content: center;
   flex-grow: 1;
+  flex-wrap: wrap;
 }
 
 #imageSearchBox {
   padding: 10px;
   font-size: 16px;
   border-radius: 5px 0 0 5px;
-  border: 1px solid #ccc;
+  border: none;
+  border-right: 2px ridge #ddd;
 }
 
 #imageSearchClick {
@@ -222,35 +225,36 @@ form {
 } */
 
 
-#categoryFilterWrapper {
+.searchFilterWrapper {
   display: inline-block;
   position: relative;
 }
 
-#categoryFilterWrapper select {
+.searchFilter {
   height: 100%;
   appearance: none;
   background-color: #ffffff;
   color: #575757;
   cursor: pointer;
-  padding: 10px 25px 10px 20px;
+  padding: 5px 20px;
   font-size: 16px;
-  border-radius: 5px 0 0 5px;
-  border: 1px solid #ccc;
+  border: none;
+  border-right: 2px ridge #ddd;
+  text-align: center;
 }
 
-#categoryFilterWrapper select:focus {
+.searchFilter:focus {
   outline: none;
   border-color: #4285f4;
   box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
 }
 
-#categoryFilterWrapper select option {
+.searchFilter option {
   background-color: #ffffff;
   color: #333333;
 }
 
-#categoryFilterWrapper::after {
+.searchFilterWrapper::after {
   content: '';
   display: block;
   position: absolute;
@@ -266,13 +270,46 @@ form {
 }
 
 
-@media (max-width: 800px) {
+@media (max-width: 830px) {
   #imageGrid {
     grid-template-columns: repeat(2, 1fr);
     margin: 5% 0;
   }
-
   #imageModalUI {
     width: 84%;
+  }
+  #topWrapper {
+    flex-direction: column-reverse;
+    margin-top: 2%;
+  }
+  #showFavorites {
+    width: fit-content;
+    align-self: flex-end;
+    margin: 2% 5%;
+    padding: 10px 15px;
+  }
+  .searchForm {
+    flex-direction: column;
+
+  }
+  #imageSearchBox {
+    border-radius: 5px 5px 0 0;
+  }
+  .searchFilterWrapper, #imageSearchBox {
+    width: 90%;
+    align-self: center;
+    text-align: center;
+  }
+  .searchFilter {
+    width: 100%;
+  }
+  #imageSearchClick {
+    align-self: center;
+    width: fit-content;
+    padding: 10px 40px;
+    border-radius: 5px;
+  }
+  #orientationFilter {
+    border-radius: 0 0 5px 5px;
   }
 }

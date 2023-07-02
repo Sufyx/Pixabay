@@ -13,11 +13,15 @@ const API_KEY = process.env.API_KEY;
 function createFetchString(req, res, next) {
     try {
         const searchparams = req.body;
-        const { searchText, requestPage, selectedCategory } = searchparams;
+        const { searchText, requestPage, selectedCategory, selectedColors, selectedOrientation } = searchparams;
         const categoryParam = (selectedCategory !== 'all') ? `&category=${selectedCategory}` : '';
+        const colorsParam = (selectedColors !== 'all') ? `&colors=${selectedColors}` : '';
+        const orientationParam = (selectedOrientation !== 'all') ? `&orientation=${selectedOrientation}` : '';
         const queryParam = searchText ? `&q=${searchText}` : '';
+        const page = requestPage ? requestPage : 1;
         const fetchString =
-            `https://pixabay.com/api/?key=${API_KEY}&page=${requestPage}` + queryParam + categoryParam;
+            `https://pixabay.com/api/?key=${API_KEY}&page=${page}` 
+            + queryParam + categoryParam + colorsParam + orientationParam;
         req.body = fetchString;
         next();
     } catch (error) {

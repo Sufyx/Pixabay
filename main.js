@@ -8,6 +8,8 @@
 let requestPage = 1;
 let searchText = '';
 let selectedCategory = 'all';
+let selectedColors = 'all';
+let selectedOrientation = 'all';
 let modalOpen = false;
 let imagesArray = [];
 let favorites = {};
@@ -15,22 +17,43 @@ const CACHE_EXPIRY = 600000;
 
 
 
-function populateCategories() {
+function populateFilters() {
     const imageCategories = [
         "Backgrounds", "Fashion", "Nature", "Science", "Education",
         "Feelings", "Health", "People", "Religion", "Places", "Animals",
         "Industry", "Computer", "Food", "Sports", "Transportation",
         "Travel", "Buildings", "Business", "Music"
     ];
-    const dropdown = document.getElementById('categoryFilter');
+    const imageColors = [
+        "Grayscale", "Transparent", "Red", "Orange", 
+        "yellow", "Green", "Turquoise", "Blue", "Lilac", 
+        "Pink", "White", "Gray", "Black", "Brown"
+    ];
+    const imageOrientations = ["Horizontal", "Vertical"];
+
+    let dropdown = document.getElementById('categoryFilter');
     imageCategories.forEach(category => {
         const option = document.createElement('option');
         option.value = category.toLowerCase();
         option.textContent = category;
         dropdown.appendChild(option);
     });
+    dropdown = document.getElementById('colorsFilter');
+    imageColors.forEach(color => {
+        const option = document.createElement('option');
+        option.value = color.toLowerCase();
+        option.textContent = color;
+        dropdown.appendChild(option);
+    });
+    dropdown = document.getElementById('orientationFilter');
+    imageOrientations.forEach(orientation => {
+        const option = document.createElement('option');
+        option.value = orientation.toLowerCase();
+        option.textContent = orientation;
+        dropdown.appendChild(option);
+    });
 }
-populateCategories()
+populateFilters()
 
 
 function populateGrid(images) {
@@ -86,6 +109,8 @@ function fetchImagesByTags() {
         const searchParams = {
             searchText: searchText,
             selectedCategory: selectedCategory,
+            selectedColors: selectedColors,
+            selectedOrientation: selectedOrientation,
             requestPage: requestPage
         }
         const fetchString =
@@ -128,6 +153,8 @@ function imageSearchClick(e) {
     e.preventDefault();
     searchText = document.getElementById("imageSearchBox").value.replace(/\s/g, '+');
     selectedCategory = document.getElementById("categoryFilter").value;
+    selectedColors = document.getElementById('colorsFilter').value;
+    selectedOrientation = document.getElementById('orientationFilter').value;
     if (!searchText && (selectedCategory === 'all')) {
         // getRandomImages();
         return;
@@ -232,7 +259,8 @@ function closeModal() {
 
 function addToCache(data) {
     try {
-        let cacheKey = searchText + selectedCategory + requestPage;
+        let cacheKey = searchText + requestPage 
+                    + selectedCategory + selectedColors + selectedOrientation;
         cacheKey = cacheKey.replace(/\s/g, '+');
         localStorage.setItem(cacheKey, JSON.stringify(data));
         const newCacheDate = new Date();
@@ -248,7 +276,8 @@ function addToCache(data) {
 
 function getFromCache() {
     try {
-        let cacheKey = searchText + selectedCategory + requestPage;
+        let cacheKey = searchText + requestPage 
+                    + selectedCategory + selectedColors + selectedOrientation;
         cacheKey = cacheKey.replace(/\s/g, '+');
         const readFromCache = JSON.parse(localStorage.getItem(cacheKey)) || null;
         return readFromCache;

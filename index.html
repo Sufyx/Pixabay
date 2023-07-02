@@ -20,13 +20,23 @@
 
     <div id="pageWrapper">
         <div id="topWrapper">
-            <form>
+            <form class="searchForm">
                 <input type="text" id="imageSearchBox" placeholder="Search...">
-                <div class="searchFilterWrapper" id="categoryFilterWrapper">
+                <div class="searchFilterWrapper">
                     <select class="searchFilter" id="categoryFilter">
-                      <option value="all">All Categories</option>
+                        <option value="all">Categories</option>
                     </select>
-                  </div>
+                </div>
+                <div class="searchFilterWrapper">
+                    <select class="searchFilter" id="colorsFilter">
+                        <option value="all">Colors</option>
+                    </select>
+                </div>
+                <div class="searchFilterWrapper">
+                    <select class="searchFilter" id="orientationFilter">
+                        <option value="all">Orientation</option>
+                    </select>
+                </div>
                 <button type="submit" id="imageSearchClick">&#x1F50D;</button>
             </form>
             <button id="showFavorites">Favorites</button>
