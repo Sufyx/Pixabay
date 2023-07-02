@@ -178,26 +178,39 @@ function imageSearchClick(e) {
 
 function imageClick(imgElement) {
     if (modalOpen) return;
+    const imgIndex = imgElement.id.substring(6)
     document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
     document.getElementById("imageModalUI").style.display = "flex";
     document.getElementById("modalImage").src = imgElement.src;
-    document.getElementById("modalImage").name = imgElement.id;
+    document.getElementById("modalImage").name = imgIndex;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
+    const favorited = (imagesArray[imgIndex].id in favorites);
+    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
+                    id="fav_${imgIndex}" onclick='favClick(this, true)'>
+                        &#10084;
+                    </span>`
+    document.getElementById("imageModalUI").innerHTML += favIcon;
     setTimeout(() => {
         modalOpen = true;
     }, 0);
 }
 
 
-function favClick(favElement) {
-    if (modalOpen) return;
+function favClick(favElement, fromModal=false) {
+    if (modalOpen && !fromModal) return;
     const imgIndex = Number(favElement.id.substring(4));
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
         favElement.style.color = "red";
+        if (fromModal) {
+            document.getElementById(`fav_${imgIndex}`).style.color = "red";
+        }
     } else {
         delete favorites[imagesArray[imgIndex].id];
         favElement.style.color = "lightslategray";
+        if (fromModal) {
+            document.getElementById(`fav_${imgIndex}`).style.color = "lightslategray";
+        }
     }
 }
 
@@ -308,7 +321,8 @@ cacheClear();
 
 function modalSilder(element, direction) {
     const sibling = (element.parentElement).children[1];
-    let imgIndex = Number(sibling.name.substring(6));
+    let imgIndex = sibling.name;
+    // let imgIndex = Number(sibling.name.substring(6));
     let nextIndex = direction === "right" ? (imgIndex + 1) : (imgIndex - 1);
     if ((imgIndex === 0) && (direction === "left")) {
         nextIndex = imagesArray.length - 1;
