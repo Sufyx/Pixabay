@@ -19,7 +19,6 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* filter: blur(4px); */
 }
 
 #topWrapper {

@@ -5,18 +5,15 @@
  */
 
 
+
 require("dotenv").config();
 const API_KEY = process.env.API_KEY;
 
 
+
 async function getImagesByTag(req, res) {
     try {
-        const searchparams = req.body;
-        const { searchText, requestPage, selectedCategory } = searchparams;
-        const categoryParam = (selectedCategory !== 'all') ? `&category=${selectedCategory}` : '';
-        const queryParam = searchText ? `&q=${searchText}` : '';
-        const fetchString =
-            `https://pixabay.com/api/?key=${API_KEY}&page=${requestPage}` + queryParam + categoryParam;
+        const fetchString = req.body;
         const response = await fetch(fetchString);
         const data = await response.json();
         res.send(data.hits);
@@ -30,9 +27,13 @@ async function getImagesByTag(req, res) {
 async function getRandomImages(req, res) {
     let randomImages = [];
     try {
-        for (let i = 0; i < 4; i++) {
+        const flip = (Math.floor(Math.random() * 2) + 1) - 1;
+        const orientation = flip ? "horizontal" : "vertical";
+        for (let i = 0; i < 5; i++) {
             const category = getRandomCategory();
-            const fetchString = `https://pixabay.com/api/?key=${API_KEY}&category=${category}&per_page=30`;
+            const page = Math.floor(Math.random() * 30) + 1;
+            const fetchString = 
+                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&per_page=5&page=${page}&orientation=${orientation}`;
             const response = await fetch(fetchString);
             const data = await response.json();
             let images = [...arrayShuffle(data.hits)];
@@ -45,6 +46,26 @@ async function getRandomImages(req, res) {
         res.status(500).send(error);
     }
 }
+// async function getRandomImages(req, res) {
+//     let randomImages = [];
+//     try {
+//         for (let i = 0; i < 5; i++) {
+//             const category = getRandomCategory();
+//             const page = Math.floor(Math.random() * 20) + 1;
+//             const fetchString = `https://pixabay.com/api/?key=${API_KEY}&category=${category}&per_page=10&page=${page}`;
+//             // const fetchString = `https://pixabay.com/api/?key=${API_KEY}&category=${category}&per_page=30`;
+//             const response = await fetch(fetchString);
+//             const data = await response.json();
+//             let images = [...arrayShuffle(data.hits)];
+//             randomImages = randomImages.concat(images);
+//         }
+//         randomImages = arrayShuffle(randomImages).slice(0, 20);
+//         res.send(randomImages);
+//     } catch (error) {
+//         console.error("getRandomImages error: ", error.message);
+//         res.status(500).send(error);
+//     }
+// }
 
 
 function getRandomCategory() {

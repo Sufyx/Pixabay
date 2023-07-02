@@ -11,6 +11,7 @@ let selectedCategory = 'all';
 let modalOpen = false;
 let imagesArray = [];
 let favorites = {};
+const CACHE_EXPIRY = 600000;
 
 
 
@@ -33,11 +34,12 @@ populateCategories()
 
 
 function populateGrid(images) {
-    for (i in images) {
-        imagesArray.push(images[i]);
-        let favorited = (images[i].id in favorites);
-        const imgElement =
-            `<div class="imageWrapper">
+    try {
+        for (i in images) {
+            imagesArray.push(images[i]);
+            let favorited = (images[i].id in favorites);
+            const imgElement =
+                `<div class="imageWrapper">
                 <img src="${images[i].webformatURL}" alt="searched image" 
                 onclick='imgClick(this)' 
                 class="imageCard" id="image_${imagesArray.length - 1}" >
@@ -54,58 +56,69 @@ function populateGrid(images) {
                     &#10084;
                 </span>
             </div>`;
-        document.getElementById("imageGrid").innerHTML += imgElement;
+            document.getElementById("imageGrid").innerHTML += imgElement;
+        }
+    } catch (error) {
+        console.error("populateGrid error: ", error.message);
     }
 }
 
 
 function getRandomImages() {
-    const fetchString = `http://localhost:3000/images/random`;
-    fetch(fetchString)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("res: ", data);
-            document.getElementById("imageGrid").innerHTML = '';
-            populateGrid(data);
-        });
+    try {
+
+        const fetchString = `http://localhost:3000/images/random`;
+        fetch(fetchString)
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById("imageGrid").innerHTML = '';
+                populateGrid(data);
+            });
+    } catch (error) {
+        console.error("getRandomImages error: ", error.message);
+    }
 }
 getRandomImages();
 
 
 function fetchImagesByTags() {
-    const searchParams = {
-        searchText: searchText,
-        selectedCategory: selectedCategory,
-        requestPage: requestPage
-    }
-    const fetchString =
-        `http://localhost:3000/images/`;
-    fetch(fetchString, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify(searchParams),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.length < 20) {
-                document.getElementById("moreImagesBtn").style.display = "none";
-                if (data.length === 0) {
-                    if (requestPage === 1) {
-                        const noResMessage =
-                            `<span class='noResMessage'>No Results found</span>`;
-                        document.getElementById("message").style.display = "block";
-                        document.getElementById("message").innerHTML = noResMessage;
+    try {
+        const searchParams = {
+            searchText: searchText,
+            selectedCategory: selectedCategory,
+            requestPage: requestPage
+        }
+        const fetchString =
+            `http://localhost:3000/images/`;
+        fetch(fetchString, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify(searchParams),
+        }).then((response) => response.json())
+            .then((data) => {
+                if (data.length < 20) {
+                    document.getElementById("moreImagesBtn").style.display = "none";
+                    if (data.length === 0) {
+                        if (requestPage === 1) {
+                            const noResMessage =
+                                `<span class='noResMessage'>No Results found</span>`;
+                            document.getElementById("message").style.display = "block";
+                            document.getElementById("message").innerHTML = noResMessage;
+                        }
+                        return;
                     }
-                    return;
                 }
-            }
-            console.log("res: ", data);
-            populateGrid(data);
-            requestPage++;
-        });
+                console.log("res: ", data);
+                addToCache(data);
+                populateGrid(data);
+                requestPage++;
+            });
+    } catch (error) {
+        console.error("fetchImagesByTags error: ", error.message);
+    }
 }
 
 
@@ -126,7 +139,12 @@ function imageSearchClick(e) {
     document.getElementById('showFavorites').innerHTML = "Favorites";
     imagesArray = [];
     requestPage = 1;
-    fetchImagesByTags();
+    const cacheData = getFromCache();
+    if (cacheData) {
+        populateGrid(cacheData);
+    } else {
+        fetchImagesByTags();
+    }
     document.getElementById("moreImagesBtn").style.display = "block";
 }
 
@@ -159,29 +177,33 @@ function favClick(favElement) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
-    document.getElementById("message").style.display = "none";
-    document.getElementById("message").innerHTML = '';
-    if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
-        backToSearch();
-        return;
-    } else if (Object.keys(favorites).length === 0) {
-        const noFavMessage =
-            `<span class='noResMessage'>No image favorited</span>`;
-        document.getElementById("message").style.display = "block";
-        document.getElementById("message").innerHTML = noFavMessage;
+    try {
+        document.getElementById("message").style.display = "none";
+        document.getElementById("message").innerHTML = '';
+        document.getElementById("imageGrid").innerHTML = '';
+        imagesArray = [];
+        if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
+            backToSearch();
+            return;
+        }
+        document.getElementById('showFavorites').innerHTML = "Back To Search";
+        document.getElementById("moreImagesBtn").style.display = "none";
+        if (Object.keys(favorites).length === 0) {
+            const noFavMessage =
+                `<span class='noResMessage'>No image favorited</span>`;
+            document.getElementById("message").style.display = "block";
+            document.getElementById("message").innerHTML = noFavMessage;
+        } else {
+            populateGrid(favorites);
+        }
+    } catch (error) {
+        console.error("showFavsClick error: ", error.message);
     }
-    document.getElementById("moreImagesBtn").style.display = "none";
-    document.getElementById("imageGrid").innerHTML = '';
-    imagesArray = [];
-    populateGrid(favorites);
-    document.getElementById('showFavorites').innerHTML = "Back To Search"
 }
 
 
 function backToSearch() {
-    document.getElementById("imageGrid").innerHTML = '';
     document.getElementById('showFavorites').innerHTML = "Favorites";
-    imagesArray = [];
     requestPage = 1;
     if (searchText || selectedCategory !== 'all') {
         fetchImagesByTags();
@@ -206,3 +228,49 @@ function closeModal() {
     document.getElementById("pageWrapper").removeEventListener('click', handlePageClick);
     modalOpen = false;
 }
+
+
+function addToCache(data) {
+    try {
+        let cacheKey = searchText + selectedCategory + requestPage;
+        cacheKey = cacheKey.replace(/\s/g, '+');
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        const newCacheDate = new Date();
+        localStorage.setItem('cacheDate', JSON.stringify(newCacheDate));
+        setTimeout(() => {
+            localStorage.removeItem(cacheKey);
+        }, CACHE_EXPIRY);
+    } catch (error) {
+        console.error("addToCache error: ", error.message);
+    }
+}
+
+
+function getFromCache() {
+    try {
+        let cacheKey = searchText + selectedCategory + requestPage;
+        cacheKey = cacheKey.replace(/\s/g, '+');
+        const readFromCache = JSON.parse(localStorage.getItem(cacheKey)) || null;
+        return readFromCache;
+    } catch (error) {
+        console.error("getFromCache error: ", error.message);
+    }
+}
+
+
+function cacheClear() {
+    try {
+        const cacheDate = JSON.parse(localStorage.getItem('cacheDate')) || null;
+        if (!cacheDate) return;
+        const timeDifference = Date.now() - (new Date(cacheDate).getTime());
+        const has24HoursPassed = timeDifference >= 86400000;
+        if (has24HoursPassed) {
+            localStorage.clear();
+            const newCacheDate = new Date();
+            localStorage.setItem('cacheDate', JSON.stringify(newCacheDate));
+        }
+    } catch (error) {
+        console.error("cacheClear error: ", error.message);
+    }
+}
+cacheClear();

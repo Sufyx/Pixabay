@@ -8,9 +8,9 @@ const express = require('express');
 const router = express.Router();
 
 const { getImagesByTag, getRandomImages } = require("./imagesController");
+const { createFetchString } = require("./middleware");
 
-
-router.post("/", getImagesByTag);
+router.post("/", createFetchString, getImagesByTag);
 router.get("/random", getRandomImages);
 
 
