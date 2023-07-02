@@ -25,8 +25,8 @@ function populateFilters() {
         "Travel", "Buildings", "Business", "Music"
     ];
     const imageColors = [
-        "Grayscale", "Transparent", "Red", "Orange", 
-        "yellow", "Green", "Turquoise", "Blue", "Lilac", 
+        "Grayscale", "Transparent", "Red", "Orange",
+        "yellow", "Green", "Turquoise", "Blue", "Lilac",
         "Pink", "White", "Gray", "Black", "Brown"
     ];
     const imageOrientations = ["Horizontal", "Vertical"];
@@ -64,7 +64,7 @@ function populateGrid(images) {
             const imgElement =
                 `<div class="imageWrapper">
                 <img src="${images[i].webformatURL}" alt="searched image" 
-                onclick='imgClick(this)' 
+                onclick='imageClick(this)' 
                 class="imageCard" id="image_${imagesArray.length - 1}" >
                 <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
                 Tags: <br> ${images[i].tags}
@@ -176,11 +176,12 @@ function imageSearchClick(e) {
 }
 
 
-function imgClick(imgElement) {
+function imageClick(imgElement) {
     if (modalOpen) return;
     document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
-    document.getElementById("imageModalUI").style.display = "block";
+    document.getElementById("imageModalUI").style.display = "flex";
     document.getElementById("modalImage").src = imgElement.src;
+    document.getElementById("modalImage").name = imgElement.id;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
     setTimeout(() => {
         modalOpen = true;
@@ -259,8 +260,8 @@ function closeModal() {
 
 function addToCache(data) {
     try {
-        let cacheKey = searchText + requestPage 
-                    + selectedCategory + selectedColors + selectedOrientation;
+        let cacheKey = searchText + requestPage
+            + selectedCategory + selectedColors + selectedOrientation;
         cacheKey = cacheKey.replace(/\s/g, '+');
         localStorage.setItem(cacheKey, JSON.stringify(data));
         const newCacheDate = new Date();
@@ -276,8 +277,8 @@ function addToCache(data) {
 
 function getFromCache() {
     try {
-        let cacheKey = searchText + requestPage 
-                    + selectedCategory + selectedColors + selectedOrientation;
+        let cacheKey = searchText + requestPage
+            + selectedCategory + selectedColors + selectedOrientation;
         cacheKey = cacheKey.replace(/\s/g, '+');
         const readFromCache = JSON.parse(localStorage.getItem(cacheKey)) || null;
         return readFromCache;
@@ -303,3 +304,17 @@ function cacheClear() {
     }
 }
 cacheClear();
+
+
+function modalSilder(element, direction) {
+    const sibling = (element.parentElement).children[1];
+    let imgIndex = Number(sibling.name.substring(6));
+    let nextIndex = direction === "right" ? (imgIndex + 1) : (imgIndex - 1);
+    if ((imgIndex === 0) && (direction === "left")) {
+        nextIndex = imagesArray.length - 1;
+    } else if ((imgIndex === imagesArray.length - 1) && (direction === "right")) {
+        nextIndex = 0;
+    }
+    document.getElementById("modalImage").src = imagesArray[nextIndex].webformatURL;
+    document.getElementById("modalImage").name = "image_" + nextIndex;
+}

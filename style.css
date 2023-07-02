@@ -45,7 +45,7 @@ body {
 
 #imageSearchClick {
   padding: 10px 20px;
-  font-size: 1.8vw;
+  font-size: 16px;
   font-weight: 600;
   background-color: #9bc19c;
   color: #fff;
@@ -120,9 +120,11 @@ body {
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
 }
+
 .imageWrapper:hover .imgTooltip {
   opacity: 1;
 }
+
 .favBtn {
   position: absolute;
   top: 4%;
@@ -137,16 +139,18 @@ body {
   transition: opacity 0.2s linear;
   z-index: 99;
 }
+
 .favBtn:hover {
   opacity: 1;
 }
+
 .favorited {
   color: red;
 }
 
 #showFavorites {
   padding: 15px 20px;
-  margin-right: 5%; 
+  margin-right: 5%;
   font-size: 15px;
   font-weight: 600;
   color: #7d9a7d;
@@ -156,6 +160,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 #showFavorites:hover {
   background-color: #dae4da;
 }
@@ -180,6 +185,8 @@ body {
 
 #imageModalUI {
   display: none;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -200,6 +207,15 @@ body {
   object-fit: cover;
 }
 
+.slider {
+  height: 100px;
+  margin: 5%;
+}
+.slider:hover {
+  filter: hue-rotate(90deg);
+  cursor: pointer;
+}
+
 .noResMessage {
   padding: 10px;
   background-color: #f8f8f8;
@@ -209,21 +225,12 @@ body {
   font-size: 4vw;
   font-weight: bold;
 }
-#message{
+
+#message {
   display: none;
   text-align: center;
   margin-top: 10%;
 }
-
-/* .slider {
-  height: 25%;
-  margin: 5%;
-}
-.slider:hover {
-  filter: hue-rotate(90deg);
-  cursor: pointer;
-} */
-
 
 .searchFilterWrapper {
   display: inline-block;
@@ -275,40 +282,54 @@ body {
     grid-template-columns: repeat(2, 1fr);
     margin: 5% 0;
   }
+
   #imageModalUI {
     width: 84%;
   }
+
+  .slider {
+    display: none;
+  }
+
   #topWrapper {
-    flex-direction: column-reverse;
+    flex-direction: column;
     margin-top: 2%;
   }
+
   #showFavorites {
     width: fit-content;
     align-self: flex-end;
     margin: 2% 5%;
     padding: 10px 15px;
+    transform: translateY(-110%);
   }
+
   .searchForm {
     flex-direction: column;
-
   }
+
   #imageSearchBox {
     border-radius: 5px 5px 0 0;
   }
-  .searchFilterWrapper, #imageSearchBox {
+
+  .searchFilterWrapper,
+  #imageSearchBox {
     width: 90%;
     align-self: center;
     text-align: center;
   }
+
   .searchFilter {
     width: 100%;
   }
+
   #imageSearchClick {
     align-self: center;
     width: fit-content;
     padding: 10px 40px;
     border-radius: 5px;
   }
+
   #orientationFilter {
     border-radius: 0 0 5px 5px;
   }
