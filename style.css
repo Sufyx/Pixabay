@@ -140,6 +140,10 @@ body {
   z-index: 99;
 }
 
+.favBtnModal {
+  font-size: 22px;
+}
+
 .favBtn:hover {
   opacity: 1;
 }

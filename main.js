@@ -80,6 +80,9 @@ function populateGrid(images) {
                 </span>
             </div>`;
             document.getElementById("imageGrid").innerHTML += imgElement;
+            document.getElementById('showFavorites').disabled = false;
+            document.getElementById('imageSearchClick').disabled = false;
+            document.getElementById('imageSearchBox').disabled = false;
         }
     } catch (error) {
         console.error("populateGrid error: ", error.message);
@@ -156,9 +159,10 @@ function imageSearchClick(e) {
     selectedColors = document.getElementById('colorsFilter').value;
     selectedOrientation = document.getElementById('orientationFilter').value;
     if (!searchText && (selectedCategory === 'all')) {
-        // getRandomImages();
         return;
     };
+    document.getElementById('imageSearchClick').disabled = true;
+    document.getElementById('imageSearchBox').disabled = true;
     document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     document.getElementById("imageGrid").innerHTML = '';
@@ -199,9 +203,12 @@ function imageClick(imgElement) {
 
 function favClick(favElement, fromModal = false) {
     if (modalOpen && !fromModal) return;
-    const imgIndex = Number(favElement.id.substring(10));
+    const imgIndex = Number(favElement.id.substring(fromModal ? 10 : 4));
+    console.log("imgIndex = " , imgIndex);
+    console.log("favElement.id = " , favElement.id);
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
+        console.log("favorites[imagesArray[imgIndex].id] = " , favorites[imagesArray[imgIndex].id]);
         favElement.style.color = "red";
         if (fromModal) {
             const gridImg = "fav_" + document.getElementById(`modalImage`).name;
@@ -222,6 +229,7 @@ function favClick(favElement, fromModal = false) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
+    document.getElementById('showFavorites').disabled = true;
     try {
         document.getElementById("message").style.display = "none";
         document.getElementById("message").innerHTML = '';
