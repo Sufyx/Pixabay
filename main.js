@@ -80,9 +80,11 @@ function populateGrid(images) {
                 </span>
             </div>`;
             document.getElementById("imageGrid").innerHTML += imgElement;
-            document.getElementById('showFavorites').disabled = false;
-            document.getElementById('imageSearchClick').disabled = false;
-            document.getElementById('imageSearchBox').disabled = false;
+            loadingOn(false);
+            // document.getElementById('showFavorites').disabled = false;
+            // document.getElementById('imageSearchClick').disabled = false;
+            // document.getElementById('imageSearchBox').disabled = false;
+            // document.getElementById('loader').style.display = "none";
         }
     } catch (error) {
         console.error("populateGrid error: ", error.message);
@@ -135,6 +137,8 @@ function fetchImagesByTags() {
                                 `<span class='noResMessage'>No Results found</span>`;
                             document.getElementById("message").style.display = "block";
                             document.getElementById("message").innerHTML = noResMessage;
+                            // document.getElementById('loader').style.display = "none";
+                            loadingOn(false);
                         }
                         return;
                     }
@@ -161,8 +165,10 @@ function imageSearchClick(e) {
     if (!searchText && (selectedCategory === 'all')) {
         return;
     };
-    document.getElementById('imageSearchClick').disabled = true;
-    document.getElementById('imageSearchBox').disabled = true;
+    // document.getElementById('loader').style.display = "block";
+    // document.getElementById('imageSearchClick').disabled = true;
+    // document.getElementById('imageSearchBox').disabled = true;
+    loadingOn(true);
     document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     document.getElementById("imageGrid").innerHTML = '';
@@ -204,11 +210,11 @@ function imageClick(imgElement) {
 function favClick(favElement, fromModal = false) {
     if (modalOpen && !fromModal) return;
     const imgIndex = Number(favElement.id.substring(fromModal ? 10 : 4));
-    console.log("imgIndex = " , imgIndex);
-    console.log("favElement.id = " , favElement.id);
+    console.log("imgIndex = ", imgIndex);
+    console.log("favElement.id = ", favElement.id);
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
-        console.log("favorites[imagesArray[imgIndex].id] = " , favorites[imagesArray[imgIndex].id]);
+        console.log("favorites[imagesArray[imgIndex].id] = ", favorites[imagesArray[imgIndex].id]);
         favElement.style.color = "red";
         if (fromModal) {
             const gridImg = "fav_" + document.getElementById(`modalImage`).name;
@@ -229,7 +235,9 @@ function favClick(favElement, fromModal = false) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
-    document.getElementById('showFavorites').disabled = true;
+    // document.getElementById('loader').style.display = "block";
+    // document.getElementById('showFavorites').disabled = true;
+    loadingOn(true);
     try {
         document.getElementById("message").style.display = "none";
         document.getElementById("message").innerHTML = '';
@@ -246,6 +254,8 @@ function showFavsClick(e) {
                 `<span class='noResMessage'>No image favorited</span>`;
             document.getElementById("message").style.display = "block";
             document.getElementById("message").innerHTML = noFavMessage;
+            // document.getElementById('loader').style.display = "none";
+            loadingOn(false);
         } else {
             populateGrid(favorites);
         }
@@ -355,4 +365,19 @@ function modalSilder(element, direction) {
     document.getElementById("imageModalUI").innerHTML += favIcon;
     document.getElementById("modalImage").src = imagesArray[nextIndex].webformatURL;
     document.getElementById("modalImage").name = nextIndex;
+}
+
+
+function loadingOn(isOn) {
+    if (isOn) {
+        document.getElementById('showFavorites').disabled = true;
+        document.getElementById('imageSearchClick').disabled = true;
+        document.getElementById('imageSearchBox').disabled = true;
+        document.getElementById('loader').style.display = "block";
+    } else {
+        document.getElementById('showFavorites').disabled = false;
+        document.getElementById('imageSearchClick').disabled = false;
+        document.getElementById('imageSearchBox').disabled = false;
+        document.getElementById('loader').style.display = "none";
+    }
 }

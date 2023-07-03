@@ -281,6 +281,28 @@ body {
 }
 
 
+#loader {
+  /* display: none; */
+  margin: 10% auto;
+  animation: spin 3s linear infinite;
+}
+#loaderImg {
+  height: 30vh;
+  box-shadow: 0 0 15px 10px #3d9731;
+  border-radius: 50%;
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
 @media (max-width: 830px) {
   #imageGrid {
     grid-template-columns: repeat(2, 1fr);
