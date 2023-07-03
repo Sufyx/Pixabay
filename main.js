@@ -178,15 +178,16 @@ function imageSearchClick(e) {
 
 function imageClick(imgElement) {
     if (modalOpen) return;
-    const imgIndex = imgElement.id.substring(6)
+    const imgIndex = Number(imgElement.id.substring(6));
     document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
     document.getElementById("imageModalUI").style.display = "flex";
     document.getElementById("modalImage").src = imgElement.src;
+    // document.getElementById("modalImage").name = imgElement.id;
     document.getElementById("modalImage").name = imgIndex;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
     const favorited = (imagesArray[imgIndex].id in favorites);
     const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
-                    id="fav_${imgIndex}" onclick='favClick(this, true)'>
+                    id="modal_fav_${imgIndex}" onclick='favClick(this, true)'>
                         &#10084;
                     </span>`
     document.getElementById("imageModalUI").innerHTML += favIcon;
@@ -196,20 +197,23 @@ function imageClick(imgElement) {
 }
 
 
-function favClick(favElement, fromModal=false) {
+function favClick(favElement, fromModal = false) {
     if (modalOpen && !fromModal) return;
-    const imgIndex = Number(favElement.id.substring(4));
+    const imgIndex = Number(favElement.id.substring(10));
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
         favElement.style.color = "red";
         if (fromModal) {
-            document.getElementById(`fav_${imgIndex}`).style.color = "red";
+            const gridImg = "fav_" + document.getElementById(`modalImage`).name;
+            document.getElementById(gridImg).style.color = "red";
         }
     } else {
         delete favorites[imagesArray[imgIndex].id];
         favElement.style.color = "lightslategray";
         if (fromModal) {
-            document.getElementById(`fav_${imgIndex}`).style.color = "lightslategray";
+            let currentModal = document.getElementById(`modalImage`).name;
+            currentModal = "fav_" + currentModal;
+            document.getElementById(currentModal).style.color = "lightslategray";
         }
     }
 }
@@ -321,14 +325,26 @@ cacheClear();
 
 function modalSilder(element, direction) {
     const sibling = (element.parentElement).children[1];
-    let imgIndex = sibling.name;
-    // let imgIndex = Number(sibling.name.substring(6));
+    const imgIndex = Number(sibling.name);
+
+    const previousFavIcon = document.getElementById(`modal_fav_${imgIndex}`);
+    if (previousFavIcon) {
+        previousFavIcon.remove();
+    }
+
     let nextIndex = direction === "right" ? (imgIndex + 1) : (imgIndex - 1);
     if ((imgIndex === 0) && (direction === "left")) {
         nextIndex = imagesArray.length - 1;
     } else if ((imgIndex === imagesArray.length - 1) && (direction === "right")) {
         nextIndex = 0;
     }
+
+    const favorited = (imagesArray[nextIndex].id in favorites);
+    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
+                    id="modal_fav_${nextIndex}" onclick='favClick(this, true)'>
+                        &#10084;
+                    </span>`
+    document.getElementById("imageModalUI").innerHTML += favIcon;
     document.getElementById("modalImage").src = imagesArray[nextIndex].webformatURL;
-    document.getElementById("modalImage").name = "image_" + nextIndex;
+    document.getElementById("modalImage").name = nextIndex;
 }
