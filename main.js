@@ -81,10 +81,6 @@ function populateGrid(images) {
             </div>`;
             document.getElementById("imageGrid").innerHTML += imgElement;
             loadingOn(false);
-            // document.getElementById('showFavorites').disabled = false;
-            // document.getElementById('imageSearchClick').disabled = false;
-            // document.getElementById('imageSearchBox').disabled = false;
-            // document.getElementById('loader').style.display = "none";
         }
     } catch (error) {
         console.error("populateGrid error: ", error.message);
@@ -137,7 +133,6 @@ function fetchImagesByTags() {
                                 `<span class='noResMessage'>No Results found</span>`;
                             document.getElementById("message").style.display = "block";
                             document.getElementById("message").innerHTML = noResMessage;
-                            // document.getElementById('loader').style.display = "none";
                             loadingOn(false);
                         }
                         return;
@@ -165,9 +160,6 @@ function imageSearchClick(e) {
     if (!searchText && (selectedCategory === 'all')) {
         return;
     };
-    // document.getElementById('loader').style.display = "block";
-    // document.getElementById('imageSearchClick').disabled = true;
-    // document.getElementById('imageSearchBox').disabled = true;
     loadingOn(true);
     document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
@@ -188,11 +180,18 @@ function imageSearchClick(e) {
 
 function imageClick(imgElement) {
     if (modalOpen) return;
+
+    const favElements = document.getElementsByClassName("favBtnModal");
+    const xElements = document.getElementsByClassName("closeModalBtn");
+    while(favElements.length > 0){
+        favElements[0].parentNode.removeChild(favElements[0]);
+        xElements[0].parentNode.removeChild(xElements[0]);
+    }
+
     const imgIndex = Number(imgElement.id.substring(6));
     document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
     document.getElementById("imageModalUI").style.display = "flex";
     document.getElementById("modalImage").src = imgElement.src;
-    // document.getElementById("modalImage").name = imgElement.id;
     document.getElementById("modalImage").name = imgIndex;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
     const favorited = (imagesArray[imgIndex].id in favorites);
@@ -200,7 +199,11 @@ function imageClick(imgElement) {
                     id="modal_fav_${imgIndex}" onclick='favClick(this, true)'>
                         &#10084;
                     </span>`
+    const xIcon = `<span class="closeModalBtn" onclick='closeModal()'>
+                        &#x2716;
+                    </span>`
     document.getElementById("imageModalUI").innerHTML += favIcon;
+    document.getElementById("imageModalUI").innerHTML += xIcon;
     setTimeout(() => {
         modalOpen = true;
     }, 0);
@@ -210,11 +213,8 @@ function imageClick(imgElement) {
 function favClick(favElement, fromModal = false) {
     if (modalOpen && !fromModal) return;
     const imgIndex = Number(favElement.id.substring(fromModal ? 10 : 4));
-    console.log("imgIndex = ", imgIndex);
-    console.log("favElement.id = ", favElement.id);
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
-        console.log("favorites[imagesArray[imgIndex].id] = ", favorites[imagesArray[imgIndex].id]);
         favElement.style.color = "red";
         if (fromModal) {
             const gridImg = "fav_" + document.getElementById(`modalImage`).name;
@@ -227,6 +227,13 @@ function favClick(favElement, fromModal = false) {
             let currentModal = document.getElementById(`modalImage`).name;
             currentModal = "fav_" + currentModal;
             document.getElementById(currentModal).style.color = "lightslategray";
+        } 
+        if(document.getElementById('showFavorites').innerHTML !== "Favorites") {
+            loadingOn(true);
+            if (fromModal) closeModal();
+            document.getElementById("imageGrid").innerHTML = '';
+            imagesArray = [];
+            populateGrid(favorites);
         }
     }
 }
@@ -235,8 +242,6 @@ function favClick(favElement, fromModal = false) {
 document.getElementById('showFavorites').addEventListener('click', showFavsClick);
 function showFavsClick(e) {
     e.preventDefault();
-    // document.getElementById('loader').style.display = "block";
-    // document.getElementById('showFavorites').disabled = true;
     loadingOn(true);
     try {
         document.getElementById("message").style.display = "none";
@@ -254,7 +259,6 @@ function showFavsClick(e) {
                 `<span class='noResMessage'>No image favorited</span>`;
             document.getElementById("message").style.display = "block";
             document.getElementById("message").innerHTML = noFavMessage;
-            // document.getElementById('loader').style.display = "none";
             loadingOn(false);
         } else {
             populateGrid(favorites);
@@ -290,6 +294,12 @@ function closeModal() {
     document.getElementById("imageModalUI").style.display = 'none';
     document.getElementById("pageWrapper").removeEventListener('click', handlePageClick);
     modalOpen = false;
+    if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
+        loadingOn(true);
+        document.getElementById("imageGrid").innerHTML = '';
+        imagesArray = [];
+        populateGrid(favorites);
+    }
 }
 
 
@@ -347,6 +357,7 @@ function modalSilder(element, direction) {
 
     const previousFavIcon = document.getElementById(`modal_fav_${imgIndex}`);
     if (previousFavIcon) {
+        console.log("previousFavIcon : ", previousFavIcon);
         previousFavIcon.remove();
     }
 

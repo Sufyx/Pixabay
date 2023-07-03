@@ -20,7 +20,7 @@ function createFetchString(req, res, next) {
         const queryParam = searchText ? `&q=${searchText}` : '';
         const page = requestPage ? requestPage : 1;
         const fetchString =
-            `https://pixabay.com/api/?key=${API_KEY}&page=${page}` 
+            `https://pixabay.com/api/?key=${API_KEY}&page=${page}&safesearch=true` 
             + queryParam + categoryParam + colorsParam + orientationParam;
         req.body = fetchString;
         next();
