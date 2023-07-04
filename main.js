@@ -53,7 +53,6 @@ function populateFilters() {
         dropdown.appendChild(option);
     });
 }
-populateFilters()
 
 
 function populateGrid(images) {
@@ -69,9 +68,9 @@ function populateGrid(images) {
                 <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
                 Tags: <br> ${images[i].tags}
                 <br> - - - <br>
-                User: ${images[i].user}
-                <br> - - - <br>
                 Likes: ${images[i].likes}
+                <br> - - - <br>
+                Views: ${images[i].views}
                 </span>
                 <span class="favBtn ${favorited ? 'favorited' : ''}" 
                     id="fav_${imagesArray.length - 1}"
@@ -96,13 +95,13 @@ function getRandomImages() {
             .then((response) => response.json())
             .then((data) => {
                 document.getElementById("imageGrid").innerHTML = '';
+                console.log("res: ", data);
                 populateGrid(data);
             });
     } catch (error) {
         console.error("getRandomImages error: ", error.message);
     }
 }
-getRandomImages();
 
 
 function fetchImagesByTags() {
@@ -158,7 +157,7 @@ function imageSearchClick(e) {
     selectedColors = document.getElementById('colorsFilter').value;
     selectedOrientation = document.getElementById('orientationFilter').value;
     if (!searchText && (selectedCategory === 'all')) {
-        document.getElementById("errorMessage").style.visibility  = "visible";
+        document.getElementById("errorMessage").style.visibility = "visible";
         return;
     };
     loadingOn(true);
@@ -185,7 +184,7 @@ function imageClick(imgElement) {
 
     const favElements = document.getElementsByClassName("favBtnModal");
     const xElements = document.getElementsByClassName("closeModalBtn");
-    while(favElements.length > 0){
+    while (favElements.length > 0) {
         favElements[0].parentNode.removeChild(favElements[0]);
         xElements[0].parentNode.removeChild(xElements[0]);
     }
@@ -193,22 +192,58 @@ function imageClick(imgElement) {
     const imgIndex = Number(imgElement.id.substring(6));
     document.getElementById("pageWrapper").addEventListener('click', handlePageClick);
     document.getElementById("imageModalUI").style.display = "flex";
-    document.getElementById("modalImage").src = imgElement.src;
-    document.getElementById("modalImage").name = imgIndex;
     document.getElementById("pageWrapper").style.filter = "blur(4px)";
-    const favorited = (imagesArray[imgIndex].id in favorites);
-    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
-                    id="modal_fav_${imgIndex}" onclick='favClick(this, true)'>
-                        &#10084;
-                    </span>`
+
     const xIcon = `<span class="closeModalBtn" onclick='closeModal()'>
                         &#x2716;
                     </span>`
-    document.getElementById("imageModalUI").innerHTML += favIcon;
     document.getElementById("imageModalUI").innerHTML += xIcon;
+    populateModal(imgIndex);
     setTimeout(() => {
         modalOpen = true;
     }, 0);
+}
+
+
+function modalSilder(element, direction) {
+    const sibling = (element.parentElement).children[1].children[0];
+    const imgIndex = Number(sibling.name);
+
+    const previousFavIcon = document.getElementById(`modal_fav_${imgIndex}`);
+    if (previousFavIcon) {
+        previousFavIcon.remove();
+    }
+
+    let nextIndex = direction === "right" ? (imgIndex + 1) : (imgIndex - 1);
+    if ((imgIndex === 0) && (direction === "left")) {
+        nextIndex = imagesArray.length - 1;
+    } else if ((imgIndex === imagesArray.length - 1) && (direction === "right")) {
+        nextIndex = 0;
+    }
+    populateModal(nextIndex);
+}
+
+
+function populateModal(imageIndex) {
+    const {
+        webformatURL, likes, views, tags, user, id, largeImageURL
+    } = imagesArray[imageIndex];
+    document.getElementById("modalImage").name = imageIndex;
+    document.getElementById("modalImage").src = webformatURL;
+    const favorited = (id in favorites);
+    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
+                    id="modal_fav_${imageIndex}" onclick='favClick(this, true)'>
+                        &#10084;
+                    </span>`
+    document.getElementById("imageModalUI").innerHTML += favIcon;
+    const modalDetails = `
+            <span class="modalSubheader">Tags:<br></span> <span>&nbsp;${tags}</span> <br>
+            <span class="modalSubheader">Likes:</span> <span>${likes}</span> <br>
+            <span class="modalSubheader">Views:</span> <span>${views}</span> <br>
+            <span class="modalSubheader">User:</span> <span>${user}</span> <br><br>
+            <a class="modalSubheader" href="${largeImageURL}" target="_blank">See full image</a>
+    `;
+    document.getElementById("modalDetails").innerHTML = modalDetails;
 }
 
 
@@ -229,8 +264,8 @@ function favClick(favElement, fromModal = false) {
             let currentModal = document.getElementById(`modalImage`).name;
             currentModal = "fav_" + currentModal;
             document.getElementById(currentModal).style.color = "lightslategray";
-        } 
-        if(document.getElementById('showFavorites').innerHTML !== "Favorites") {
+        }
+        if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
             document.getElementById("imageGrid").innerHTML = '';
             imagesArray = [];
             if (fromModal) closeModal();
@@ -351,34 +386,6 @@ function cacheClear() {
         console.error("cacheClear error: ", error.message);
     }
 }
-cacheClear();
-
-
-function modalSilder(element, direction) {
-    const sibling = (element.parentElement).children[1];
-    const imgIndex = Number(sibling.name);
-
-    const previousFavIcon = document.getElementById(`modal_fav_${imgIndex}`);
-    if (previousFavIcon) {
-        previousFavIcon.remove();
-    }
-
-    let nextIndex = direction === "right" ? (imgIndex + 1) : (imgIndex - 1);
-    if ((imgIndex === 0) && (direction === "left")) {
-        nextIndex = imagesArray.length - 1;
-    } else if ((imgIndex === imagesArray.length - 1) && (direction === "right")) {
-        nextIndex = 0;
-    }
-
-    const favorited = (imagesArray[nextIndex].id in favorites);
-    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
-                    id="modal_fav_${nextIndex}" onclick='favClick(this, true)'>
-                        &#10084;
-                    </span>`
-    document.getElementById("imageModalUI").innerHTML += favIcon;
-    document.getElementById("modalImage").src = imagesArray[nextIndex].webformatURL;
-    document.getElementById("modalImage").name = nextIndex;
-}
 
 
 function loadingOn(isOn) {
@@ -396,6 +403,7 @@ function loadingOn(isOn) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // searchImages();
+    cacheClear();
+    populateFilters();
+    getRandomImages();
   });
-

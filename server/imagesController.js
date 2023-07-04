@@ -29,16 +29,16 @@ async function getRandomImages(req, res) {
     try {
         let flip = (Math.floor(Math.random() * 2) + 1) - 1;
         const orientation = flip ? "horizontal" : "vertical";
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 5; i++) {
             const category = getRandomCategory();
-            const page = Number(Math.floor(Math.random() * 100) + 1);
+            const page = Number(Math.floor(Math.random() * 50) + 1);
             flip = (Math.floor(Math.random() * 2) + 1) - 1;
             const order = flip ? "popular" : "latest";
             const fetchString = 
-                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&order=${order}&per_page=7&page=${page}&orientation=${orientation}&safesearch=true`;
+                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&order=${order}&per_page=8&page=${page}&orientation=${orientation}&safesearch=true`;
             const response = await fetch(fetchString);
             const data = await response.json();
-            randomImages = randomImages.concat(data.hits);
+            randomImages = randomImages.concat(arrayShuffle(data.hits));
         }
         randomImages = arrayShuffle(randomImages).slice(0, 20);
         res.send(randomImages);
