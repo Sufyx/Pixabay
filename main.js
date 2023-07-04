@@ -64,7 +64,7 @@ function populateGrid(images) {
             const imgElement =
                 `<div class="imageWrapper">
                 <img src="${images[i].webformatURL}" alt="searched image" 
-                onclick='imageClick(this)' 
+                onclick='imageClick(this)' alt="${images[i].tags}"
                 class="imageCard" id="image_${imagesArray.length - 1}" >
                 <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
                 Tags: <br> ${images[i].tags}
@@ -80,11 +80,11 @@ function populateGrid(images) {
                 </span>
             </div>`;
             document.getElementById("imageGrid").innerHTML += imgElement;
-            loadingOn(false);
         }
     } catch (error) {
         console.error("populateGrid error: ", error.message);
     }
+    loadingOn(false);
 }
 
 
@@ -158,9 +158,11 @@ function imageSearchClick(e) {
     selectedColors = document.getElementById('colorsFilter').value;
     selectedOrientation = document.getElementById('orientationFilter').value;
     if (!searchText && (selectedCategory === 'all')) {
+        document.getElementById("errorMessage").style.visibility  = "visible";
         return;
     };
     loadingOn(true);
+    document.getElementById("errorMessage").style.visibility = "hidden";
     document.getElementById("message").style.display = "none";
     document.getElementById("message").innerHTML = '';
     document.getElementById("imageGrid").innerHTML = '';
@@ -229,11 +231,18 @@ function favClick(favElement, fromModal = false) {
             document.getElementById(currentModal).style.color = "lightslategray";
         } 
         if(document.getElementById('showFavorites').innerHTML !== "Favorites") {
-            loadingOn(true);
-            if (fromModal) closeModal();
             document.getElementById("imageGrid").innerHTML = '';
             imagesArray = [];
-            populateGrid(favorites);
+            if (fromModal) closeModal();
+            if (Object.keys(favorites).length === 0) {
+                const noFavMessage =
+                    `<span class='noResMessage'>No image favorited</span>`;
+                document.getElementById("message").style.display = "block";
+                document.getElementById("message").innerHTML = noFavMessage;
+            } else {
+                loadingOn(true);
+                populateGrid(favorites);
+            }
         }
     }
 }
@@ -252,7 +261,7 @@ function showFavsClick(e) {
             backToSearch();
             return;
         }
-        document.getElementById('showFavorites').innerHTML = "Back To Search";
+        document.getElementById('showFavorites').innerHTML = "&#x21fd; Back";
         document.getElementById("moreImagesBtn").style.display = "none";
         if (Object.keys(favorites).length === 0) {
             const noFavMessage =
@@ -294,12 +303,6 @@ function closeModal() {
     document.getElementById("imageModalUI").style.display = 'none';
     document.getElementById("pageWrapper").removeEventListener('click', handlePageClick);
     modalOpen = false;
-    if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
-        loadingOn(true);
-        document.getElementById("imageGrid").innerHTML = '';
-        imagesArray = [];
-        populateGrid(favorites);
-    }
 }
 
 
@@ -357,7 +360,6 @@ function modalSilder(element, direction) {
 
     const previousFavIcon = document.getElementById(`modal_fav_${imgIndex}`);
     if (previousFavIcon) {
-        console.log("previousFavIcon : ", previousFavIcon);
         previousFavIcon.remove();
     }
 
@@ -392,3 +394,8 @@ function loadingOn(isOn) {
         document.getElementById('loader').style.display = "none";
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    // searchImages();
+  });
+

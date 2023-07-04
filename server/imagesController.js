@@ -27,17 +27,18 @@ async function getImagesByTag(req, res) {
 async function getRandomImages(req, res) {
     let randomImages = [];
     try {
-        const flip = (Math.floor(Math.random() * 2) + 1) - 1;
+        let flip = (Math.floor(Math.random() * 2) + 1) - 1;
         const orientation = flip ? "horizontal" : "vertical";
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             const category = getRandomCategory();
-            const page = Math.floor(Math.random() * 30) + 1;
+            const page = Number(Math.floor(Math.random() * 100) + 1);
+            flip = (Math.floor(Math.random() * 2) + 1) - 1;
+            const order = flip ? "popular" : "latest";
             const fetchString = 
-                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&per_page=5&page=${page}&orientation=${orientation}&safesearch=true`;
+                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&order=${order}&per_page=7&page=${page}&orientation=${orientation}&safesearch=true`;
             const response = await fetch(fetchString);
             const data = await response.json();
-            let images = [...arrayShuffle(data.hits)];
-            randomImages = randomImages.concat(images);
+            randomImages = randomImages.concat(data.hits);
         }
         randomImages = arrayShuffle(randomImages).slice(0, 20);
         res.send(randomImages);
@@ -53,7 +54,7 @@ function getRandomCategory() {
         "backgrounds", "fashion", "nature", "science", "education",
         "feelings", "health", "people", "religion", "places", "animals",
         "industry", "computer", "food", "sports", "transportation",
-        "travel", "buildings", "business", "music"
+        "travel", "buildings", "business", "music", ""
     ];
     const randomIndex = Math.floor(Math.random() * imageCategories.length);
     const randomCategory = imageCategories[randomIndex];
