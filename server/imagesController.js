@@ -7,7 +7,9 @@
 
 
 require("dotenv").config();
-const API_KEY = process.env.API_KEY;
+// I realize that putting the key here misses the point an env file,
+// I just wanted to save the trouble for the people checking the project :)
+const API_KEY = process.env.API_KEY || '37958354-de46dabfdd71801db390aedd0';
 
 
 
