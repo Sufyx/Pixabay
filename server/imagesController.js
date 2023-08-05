@@ -26,6 +26,7 @@ async function getImagesByTag(req, res) {
 }
 
 
+
 async function getRandomImages(req, res) {
     let randomImages = [];
     try {
@@ -33,11 +34,11 @@ async function getRandomImages(req, res) {
         const orientation = flip ? "horizontal" : "vertical";
         for (let i = 0; i < 5; i++) {
             const category = getRandomCategory();
-            const page = Number(Math.floor(Math.random() * 50) + 1);
+            const page = Number(Math.floor(Math.random() * 40) + 1);
             flip = (Math.floor(Math.random() * 2) + 1) - 1;
             const order = flip ? "popular" : "latest";
             const fetchString = 
-                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&order=${order}&per_page=8&page=${page}&orientation=${orientation}&safesearch=true`;
+                `https://pixabay.com/api/?key=${API_KEY}&category=${category}&order=${order}&per_page=5&page=${page}&orientation=${orientation}&safesearch=true`;
             const response = await fetch(fetchString);
             const data = await response.json();
             randomImages = randomImages.concat(arrayShuffle(data.hits));
@@ -46,6 +47,17 @@ async function getRandomImages(req, res) {
         res.send(randomImages);
     } catch (error) {
         console.error("getRandomImages error: ", error.message);
+        getFallback(res);
+    }
+}
+
+async function getFallback(res) {
+    try {
+        const response = await fetch(`https://pixabay.com/api/?key=${API_KEY}&safesearch=true`)
+        const data = await response.json();
+        res.send(data.hits);
+    } catch (error) {
+        console.error("randomFetchFallback error: ", error.message);
         res.status(500).send(error);
     }
 }

@@ -16,7 +16,10 @@ let favorites = {};
 const CACHE_EXPIRY = 600000;
 
 
-
+/**
+ * Create the "option" elements for the image search filters,
+ * values are in accordance to Pixabay API.
+ */
 function populateFilters() {
     const imageCategories = [
         "Backgrounds", "Fashion", "Nature", "Science", "Education",
@@ -54,30 +57,34 @@ function populateFilters() {
     });
 }
 
-
+/**
+ * Receives an array of image objects as they are received from the Pixabay request,
+ * and fills a grid on the html page.
+ */
 function populateGrid(images) {
     try {
         for (i in images) {
             imagesArray.push(images[i]);
             let favorited = (images[i].id in favorites);
+
             const imgElement =
                 `<div class="imageWrapper">
-                <img src="${images[i].webformatURL}" alt="searched image" 
-                onclick='imageClick(this)' alt="${images[i].tags}"
-                class="imageCard" id="image_${imagesArray.length - 1}" >
-                <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
-                Tags: <br> ${images[i].tags}
-                <br> - - - <br>
-                Likes: ${images[i].likes}
-                <br> - - - <br>
-                Views: ${images[i].views}
-                </span>
-                <span class="favBtn ${favorited ? 'favorited' : ''}" 
-                    id="fav_${imagesArray.length - 1}"
-                    onclick='favClick(this)'>
-                    &#10084;
-                </span>
-            </div>`;
+                    <img src="${images[i].webformatURL}" alt="searched image" 
+                        onclick='imageClick(this)' alt="${images[i].tags}"
+                        class="imageCard" id="image_${imagesArray.length - 1}" >
+                    <span class="imgTooltip" id="tooltip_${imagesArray.length - 1}">
+                        Tags: <br> ${images[i].tags}
+                        <br> - - - <br>
+                        Likes: ${images[i].likes}
+                        <br> - - - <br>
+                        Views: ${images[i].views}
+                    </span>
+                    <span class="favBtn ${favorited ? 'favorited' : ''}" 
+                        id="fav_${imagesArray.length - 1}"
+                        onclick='favClick(this)'>
+                        &#10084;
+                    </span>
+                </div>`;
             document.getElementById("imageGrid").innerHTML += imgElement;
         }
     } catch (error) {
@@ -86,16 +93,16 @@ function populateGrid(images) {
     loadingOn(false);
 }
 
-
+/**
+ * Fetches random images.
+ */
 function getRandomImages() {
     try {
-
         const fetchString = `http://localhost:3000/images/random`;
         fetch(fetchString)
             .then((response) => response.json())
             .then((data) => {
                 document.getElementById("imageGrid").innerHTML = '';
-                console.log("res: ", data);
                 populateGrid(data);
             });
     } catch (error) {
@@ -103,7 +110,9 @@ function getRandomImages() {
     }
 }
 
-
+/**
+ * Fetches images according to the search parameters.
+ */
 function fetchImagesByTags() {
     try {
         const searchParams = {
@@ -137,7 +146,6 @@ function fetchImagesByTags() {
                         return;
                     }
                 }
-                console.log("res: ", data);
                 addToCache(data);
                 populateGrid(data);
                 requestPage++;
@@ -147,9 +155,10 @@ function fetchImagesByTags() {
     }
 }
 
-
-document.getElementById('moreImagesBtn').addEventListener('click', fetchImagesByTags);
-document.getElementById('imageSearchClick').addEventListener('click', imageSearchClick);
+/**
+ * Event for prompting an image search.
+ * Gets the search parameters and prepares the page to present the image grid.
+ */
 function imageSearchClick(e) {
     e.preventDefault();
     searchText = document.getElementById("imageSearchBox").value.replace(/\s/g, '+');
@@ -178,7 +187,10 @@ function imageSearchClick(e) {
     document.getElementById("moreImagesBtn").style.display = "block";
 }
 
-
+/**
+ * Click event for clicking on an image.
+ * Opens a modal with details and a preview of the image.
+ */
 function imageClick(imgElement) {
     if (modalOpen) return;
 
@@ -204,8 +216,11 @@ function imageClick(imgElement) {
     }, 0);
 }
 
-
-function modalSilder(element, direction) {
+/**
+ * Event for clicking either of the modal's scroll (arrow) buttons.
+ * Changes the modal to the next/previous image on the grid.
+ */
+function modalSlider(element, direction) {
     const sibling = (element.parentElement).children[1].children[0];
     const imgIndex = Number(sibling.name);
 
@@ -223,36 +238,52 @@ function modalSilder(element, direction) {
     populateModal(nextIndex);
 }
 
-
+/**
+ * Create and display the modal element
+ */
 function populateModal(imageIndex) {
     const {
         webformatURL, likes, views, tags, user, id, largeImageURL
     } = imagesArray[imageIndex];
+
     document.getElementById("modalImage").name = imageIndex;
     document.getElementById("modalImage").src = webformatURL;
+
     const favorited = (id in favorites);
-    const favIcon = `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
-                    id="modal_fav_${imageIndex}" onclick='favClick(this, true)'>
-                        &#10084;
-                    </span>`
+    const favIcon =
+        `<span class="favBtn favBtnModal ${favorited ? 'favorited' : ''}" 
+            id="modal_fav_${imageIndex}" onclick='favClick(this, true)'>
+                &#10084;
+        </span>`
     document.getElementById("imageModalUI").innerHTML += favIcon;
-    const modalDetails = `
-            <span class="modalSubheader">Tags:<br></span> <span>&nbsp;${tags}</span> <br>
-            <span class="modalSubheader">Likes:</span> <span>${likes}</span> <br>
-            <span class="modalSubheader">Views:</span> <span>${views}</span> <br>
-            <span class="modalSubheader">User:</span> <span>${user}</span> <br><br>
-            <a class="modalSubheader" href="${largeImageURL}" target="_blank">See full image</a>
-    `;
+
+    const modalDetails =
+        `<span class="modalSubheader">
+            Tags:<br></span> <span>&nbsp;${tags}
+        </span> <br>
+        <span class="modalSubheader">Likes:</span> <span>${likes}</span> <br>
+        <span class="modalSubheader">Views:</span> <span>${views}</span> <br>
+        <span class="modalSubheader">User:</span> <span>${user}</span>
+        <br><br>
+        <a class="modalSubheader" href="${largeImageURL}" target="_blank">
+            See full image
+        </a>`;
     document.getElementById("modalDetails").innerHTML = modalDetails;
 }
 
-
+/**
+ * Event for clicking an image's "favorites" icon.
+ * Either on the grid or on modal.
+ * If an image is unfavorited while in favorites "section", it will be instantly removed
+ */
 function favClick(favElement, fromModal = false) {
     if (modalOpen && !fromModal) return;
+
     const imgIndex = Number(favElement.id.substring(fromModal ? 10 : 4));
     if (!(imagesArray[imgIndex].id in favorites)) {
         favorites[imagesArray[imgIndex].id] = imagesArray[imgIndex];
         favElement.style.color = "red";
+
         if (fromModal) {
             const gridImg = "fav_" + document.getElementById(`modalImage`).name;
             document.getElementById(gridImg).style.color = "red";
@@ -260,6 +291,7 @@ function favClick(favElement, fromModal = false) {
     } else {
         delete favorites[imagesArray[imgIndex].id];
         favElement.style.color = "lightslategray";
+
         if (fromModal) {
             let currentModal = document.getElementById(`modalImage`).name;
             currentModal = "fav_" + currentModal;
@@ -269,6 +301,7 @@ function favClick(favElement, fromModal = false) {
             document.getElementById("imageGrid").innerHTML = '';
             imagesArray = [];
             if (fromModal) closeModal();
+
             if (Object.keys(favorites).length === 0) {
                 const noFavMessage =
                     `<span class='noResMessage'>No image favorited</span>`;
@@ -282,8 +315,10 @@ function favClick(favElement, fromModal = false) {
     }
 }
 
-
-document.getElementById('showFavorites').addEventListener('click', showFavsClick);
+/**
+ * Event for clicking the "Favorites"/"Back" button.
+ * Changes the grid to show favorited images.
+ */
 function showFavsClick(e) {
     e.preventDefault();
     loadingOn(true);
@@ -292,12 +327,14 @@ function showFavsClick(e) {
         document.getElementById("message").innerHTML = '';
         document.getElementById("imageGrid").innerHTML = '';
         imagesArray = [];
+
         if (document.getElementById('showFavorites').innerHTML !== "Favorites") {
             backToSearch();
             return;
         }
         document.getElementById('showFavorites').innerHTML = "&#x21fd; Back";
         document.getElementById("moreImagesBtn").style.display = "none";
+
         if (Object.keys(favorites).length === 0) {
             const noFavMessage =
                 `<span class='noResMessage'>No image favorited</span>`;
@@ -312,7 +349,10 @@ function showFavsClick(e) {
     }
 }
 
-
+/**
+ * Changes the grid from favorited images to show the latest search,
+ *  or random images if there wasn't one.
+ */
 function backToSearch() {
     document.getElementById('showFavorites').innerHTML = "Favorites";
     requestPage = 1;
@@ -324,7 +364,9 @@ function backToSearch() {
     }
 }
 
-
+/**
+ * Event for clicking on the page outside the modal, when modal is up
+ */
 function handlePageClick(e) {
     if (!document.getElementById("imageModalUI").contains(e.target)) {
         closeModal();
@@ -370,11 +412,15 @@ function getFromCache() {
     }
 }
 
-
+/**
+ * Clears the cache if it's been 24 hours since last update.
+ * Individual cache entries have a timed removal, so this is a fail-safe.
+ */
 function cacheClear() {
     try {
         const cacheDate = JSON.parse(localStorage.getItem('cacheDate')) || null;
         if (!cacheDate) return;
+        
         const timeDifference = Date.now() - (new Date(cacheDate).getTime());
         const has24HoursPassed = timeDifference >= 86400000;
         if (has24HoursPassed) {
@@ -387,7 +433,9 @@ function cacheClear() {
     }
 }
 
-
+/**
+ * Handles the spinner-loader, that's displayed during requests and page-loads.
+ */
 function loadingOn(isOn) {
     if (isOn) {
         document.getElementById('showFavorites').disabled = true;
@@ -402,8 +450,12 @@ function loadingOn(isOn) {
     }
 }
 
+
+document.getElementById('showFavorites').addEventListener('click', showFavsClick);
+document.getElementById('moreImagesBtn').addEventListener('click', fetchImagesByTags);
+document.getElementById('imageSearchClick').addEventListener('click', imageSearchClick);
 document.addEventListener("DOMContentLoaded", () => {
     cacheClear();
     populateFilters();
     getRandomImages();
-  });
+});
