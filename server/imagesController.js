@@ -1,15 +1,12 @@
 /**
  * Image Displayer
  * Asaf Gilboa
- * 30/06/2023
  */
 
 
 
 require("dotenv").config();
-// I realize that putting the key here misses the point an env file,
-// I just wanted to save the trouble for the people checking the project :)
-const API_KEY = process.env.API_KEY || '37958354-de46dabfdd71801db390aedd0';
+const API_KEY = process.env.API_KEY;
 
 
 
@@ -85,6 +82,6 @@ function arrayShuffle(array) {
 }
 
 
-module.exports = {
+export default {
     getImagesByTag, getRandomImages
 };
